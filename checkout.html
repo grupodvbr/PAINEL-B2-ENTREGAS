@@ -159,65 +159,70 @@
     </div>
   </div>
 
-  <script>
-    function buscarCEP() {
-      const cep = document.getElementById("cep").value.replace(/\D/g, '');
-      if (cep.length !== 8) return;
+<!-- Mantém o mesmo código do HTML anterior, apenas ajustamos o fetch: -->
 
-      fetch(`https://viacep.com.br/ws/${cep}/json/`)
-        .then(res => res.json())
-        .then(data => {
-          if (data.erro) throw new Error();
-          document.getElementById("rua").value = data.logradouro || '';
-          document.getElementById("bairro").value = data.bairro || '';
-          document.getElementById("cidade").value = data.localidade || '';
-          document.getElementById("estado").value = data.uf || '';
-        })
-        .catch(() => alert("CEP inválido ou não encontrado."));
-    }
+<script>
+  function buscarCEP() {
+    const cep = document.getElementById("cep").value.replace(/\D/g, '');
+    if (cep.length !== 8) return;
 
-    function abrirModalSenha() {
-      document.getElementById("modalSenha").style.display = "flex";
-    }
-
-    function enviarCadastro() {
-      const senha1 = document.getElementById("senha1").value.trim();
-      const senha2 = document.getElementById("senha2").value.trim();
-      if (!senha1 || senha1 !== senha2) {
-        alert("❌ As senhas não conferem.");
-        return;
-      }
-
-      const form = document.getElementById("checkoutForm");
-      const dados = new FormData(form);
-      dados.append("senha", senha1);
-
-      const objeto = {};
-      for (let [chave, valor] of dados.entries()) {
-        objeto[chave] = valor;
-      }
-
-      fetch("https://script.google.com/macros/s/AKfycbykhCit2l3PNAjq2pw3FIth3ohBkgx3tYd0ViS7yHPE5aI6BT0kk4m0YBhWf1DzupWIzw/exec", {
-        method: "POST",
-        body: new URLSearchParams(objeto)
+    fetch(`https://viacep.com.br/ws/${cep}/json/`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.erro) throw new Error();
+        document.getElementById("rua").value = data.logradouro || '';
+        document.getElementById("bairro").value = data.bairro || '';
+        document.getElementById("cidade").value = data.localidade || '';
+        document.getElementById("estado").value = data.uf || '';
       })
-      .then(res => res.text())
-      .then(res => {
+      .catch(() => alert("CEP inválido ou não encontrado."));
+  }
+
+  function abrirModalSenha() {
+    document.getElementById("modalSenha").style.display = "flex";
+  }
+
+  function enviarCadastro() {
+    const senha1 = document.getElementById("senha1").value.trim();
+    const senha2 = document.getElementById("senha2").value.trim();
+    if (!senha1 || senha1 !== senha2) {
+      alert("❌ As senhas não conferem.");
+      return;
+    }
+
+    const form = document.getElementById("checkoutForm");
+    const dados = new FormData(form);
+    dados.append("senha", senha1);
+
+    const objeto = {};
+    for (let [chave, valor] of dados.entries()) {
+      objeto[chave] = valor;
+    }
+
+    fetch("https://script.google.com/macros/s/AKfycbykhCit2l3PNAjq2pw3FIth3ohBkgx3tYd0ViS7yHPE5aI6BT0kk4m0YBhWf1DzupWIzw/exec", {
+      method: "POST",
+      body: new URLSearchParams(objeto)
+    })
+    .then(res => res.json())
+    .then(res => {
+      if (res.status === "cadastrado") {
         document.getElementById("mensagem").innerText = "✅ Cadastro realizado com sucesso!";
         document.getElementById("modalSenha").style.display = "none";
         form.reset();
-      })
-      .catch(() => alert("❌ Erro ao enviar dados. Verifique sua conexão."));
-    }
-
-    // Fecha o modal se clicar fora
-    window.onclick = function(e) {
-      const modal = document.getElementById("modalSenha");
-      if (e.target === modal) {
-        modal.style.display = "none";
+      } else {
+        alert("❌ Ocorreu um erro no cadastro.");
       }
-    }
-  </script>
+    })
+    .catch(() => alert("❌ Erro ao enviar dados. Verifique sua conexão."));
+  }
 
+  // Fecha o modal se clicar fora
+  window.onclick = function(e) {
+    const modal = document.getElementById("modalSenha");
+    if (e.target === modal) {
+      modal.style.display = "none";
+    }
+  }
+</script>
 </body>
 </html>
