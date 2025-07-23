@@ -32,11 +32,28 @@
       font-weight: bold;
     }
 
-    input {
+    .input-group {
+      position: relative;
+    }
+
+    input[type="email"],
+    input[type="password"] {
       width: 100%;
       padding: 10px;
+      padding-right: 40px;
       border-radius: 6px;
       border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+
+    .toggle-password {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      font-size: 14px;
+      color: #666;
     }
 
     button {
@@ -49,6 +66,10 @@
       font-size: 16px;
       border-radius: 6px;
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
     }
 
     button:disabled {
@@ -58,6 +79,20 @@
 
     button:hover:not(:disabled) {
       background-color: #2980b9;
+    }
+
+    .spinner {
+      border: 3px solid #fff;
+      border-top: 3px solid #2980b9;
+      border-radius: 50%;
+      width: 16px;
+      height: 16px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
 
     .cadastro {
@@ -86,9 +121,15 @@
       <input type="email" id="email" required>
 
       <label for="senha">Senha</label>
-      <input type="password" id="senha" required>
+      <div class="input-group">
+        <input type="password" id="senha" required>
+        <span class="toggle-password" onclick="toggleSenha()">👁️</span>
+      </div>
 
-      <button type="submit" id="btnEntrar">Entrar</button>
+      <button type="submit" id="btnEntrar">
+        <span id="btnText">Entrar</span>
+        <div id="btnSpinner" class="spinner" style="display: none;"></div>
+      </button>
     </form>
 
     <div class="cadastro">
@@ -99,8 +140,15 @@
   </div>
 
   <script>
+    function toggleSenha() {
+      const senhaInput = document.getElementById("senha");
+      senhaInput.type = senhaInput.type === "password" ? "text" : "password";
+    }
+
     const form = document.getElementById("loginForm");
     const btnEntrar = document.getElementById("btnEntrar");
+    const btnText = document.getElementById("btnText");
+    const btnSpinner = document.getElementById("btnSpinner");
     const erroLogin = document.getElementById("erroLogin");
 
     form.addEventListener("submit", function(e) {
@@ -110,7 +158,8 @@
       erroLogin.textContent = "";
 
       btnEntrar.disabled = true;
-      btnEntrar.textContent = "🔄 Verificando...";
+      btnText.textContent = "Verificando...";
+      btnSpinner.style.display = "inline-block";
 
       fetch("https://script.google.com/macros/s/AKfycby-x46eJe2R_EPQOZ10LdBjd2R-aSg6VBcgeLTN4l-xP0hvN95YTYmlheSjihpIv9F4/exec", {
         method: "POST",
@@ -136,7 +185,8 @@
       })
       .finally(() => {
         btnEntrar.disabled = false;
-        btnEntrar.textContent = "Entrar";
+        btnText.textContent = "Entrar";
+        btnSpinner.style.display = "none";
       });
     });
   </script>
