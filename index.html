@@ -46,13 +46,13 @@
       align-items: center;
       gap: 10px;
       font-size: 0.9em;
-      cursor: pointer;
     }
     .dropdown-toggle {
       color: #3498db;
       font-weight: 600;
       padding: 8px;
       border-radius: 6px;
+      cursor: pointer;
     }
     .user-dropdown {
       display: none;
@@ -155,15 +155,15 @@
     </div>
     <div class="user-menu">
       <span title="Ajuda">❓</span>
-      <div class="dropdown-toggle" onclick="toggleDropdown()">CLENA STORE ▾</div>
+      <div id="usuarioLogado" class="dropdown-toggle" onclick="toggleDropdown()" style="display:none;"></div>
+      <a id="botaoLogin" href="checkout.html" style="color:#3498db; font-weight:bold;">Login / Cadastro</a>
       <div id="userDropdown" class="user-dropdown">
-        <a href="trocar-senha.html">Trocar senha</a>
-        <a href="logout.html">Sair</a>
+        <a href="#" onclick="logout()">Sair</a>
       </div>
     </div>
   </div>
 
-  <div class="container">
+  <div class="container" id="painelContainer" style="display:none;">
     <div class="titulo">📊 Indicadores</div>
     <p>Estatísticas da operação</p>
 
@@ -212,50 +212,59 @@
       dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
     }
 
-    document.addEventListener('click', function(e) {
-      if (!e.target.closest('.user-menu')) {
-        document.getElementById("userDropdown").style.display = "none";
-      }
-    });
+    function logout() {
+      localStorage.clear();
+      location.reload();
+    }
 
-    // Substitua esta URL pela URL do seu script Google Apps Script publicado
-    const url = "https://script.google.com/macros/s/SEU_SCRIPT_ID/exec";
+    const nome = localStorage.getItem("usuarioNome");
+    const email = localStorage.getItem("usuarioEmail");
 
-    fetch(url)
-      .then(res => res.json())
-      .then(data => {
-        document.getElementById("nome").textContent = data.nome;
-        document.getElementById("email").textContent = data.email;
-        document.getElementById("credito").textContent = `R$ ${parseFloat(data.credito).toFixed(2)}`;
-        document.getElementById("custo_total").textContent = `R$ ${parseFloat(data.custo_total).toFixed(2)}`;
-        document.getElementById("pedidos_entregues").textContent = data.pedidos_entregues;
+    if (nome && email) {
+      document.getElementById("botaoLogin").style.display = "none";
+      const userDisplay = document.getElementById("usuarioLogado");
+      userDisplay.textContent = `${nome} ▾`;
+      userDisplay.style.display = "inline-block";
+      document.getElementById("painelContainer").style.display = "block";
 
-        document.getElementById("finalizadas").textContent = data.finalizadas;
-        document.getElementById("nao_atendidas").textContent = data.nao_atendidas;
-        document.getElementById("canceladas").textContent = data.canceladas;
+      // Substitua pela URL real do seu Google Apps Script
+      const url = "https://script.google.com/macros/s/SEU_SCRIPT_ID/exec";
 
-        const ctx = document.getElementById('graficoPizza').getContext('2d');
-        new Chart(ctx, {
-          type: 'doughnut',
-          data: {
-            labels: ['Finalizadas', 'Não atendidas', 'Canceladas'],
-            datasets: [{
-              data: [
-                parseInt(data.finalizadas),
-                parseInt(data.nao_atendidas),
-                parseInt(data.canceladas)
-              ],
-              backgroundColor: ['#2ecc71', '#95a5a6', '#e74c3c']
-            }]
-          },
-          options: {
-            responsive: true,
-            plugins: {
-              legend: { position: 'bottom' }
+      fetch(url)
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById("nome").textContent = data.nome;
+          document.getElementById("email").textContent = data.email;
+          document.getElementById("credito").textContent = `R$ ${parseFloat(data.credito).toFixed(2)}`;
+          document.getElementById("custo_total").textContent = `R$ ${parseFloat(data.custo_total).toFixed(2)}`;
+          document.getElementById("pedidos_entregues").textContent = data.pedidos_entregues;
+          document.getElementById("finalizadas").textContent = data.finalizadas;
+          document.getElementById("nao_atendidas").textContent = data.nao_atendidas;
+          document.getElementById("canceladas").textContent = data.canceladas;
+
+          const ctx = document.getElementById('graficoPizza').getContext('2d');
+          new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+              labels: ['Finalizadas', 'Não atendidas', 'Canceladas'],
+              datasets: [{
+                data: [
+                  parseInt(data.finalizadas),
+                  parseInt(data.nao_atendidas),
+                  parseInt(data.canceladas)
+                ],
+                backgroundColor: ['#2ecc71', '#95a5a6', '#e74c3c']
+              }]
+            },
+            options: {
+              responsive: true,
+              plugins: {
+                legend: { position: 'bottom' }
+              }
             }
-          }
+          });
         });
-      });
+    }
   </script>
 </body>
 </html>
