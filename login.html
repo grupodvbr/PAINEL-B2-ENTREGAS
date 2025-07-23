@@ -51,7 +51,12 @@
       cursor: pointer;
     }
 
-    button:hover {
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    button:hover:not(:disabled) {
       background-color: #2980b9;
     }
 
@@ -83,7 +88,7 @@
       <label for="senha">Senha</label>
       <input type="password" id="senha" required>
 
-      <button type="submit">Entrar</button>
+      <button type="submit" id="btnEntrar">Entrar</button>
     </form>
 
     <div class="cadastro">
@@ -93,38 +98,47 @@
     <div class="erro" id="erroLogin"></div>
   </div>
 
-<script>
-  document.getElementById("loginForm").addEventListener("submit", function(e) {
-    e.preventDefault();
-    const email = document.getElementById("email").value.trim();
-    const senha = document.getElementById("senha").value.trim();
+  <script>
+    const form = document.getElementById("loginForm");
+    const btnEntrar = document.getElementById("btnEntrar");
     const erroLogin = document.getElementById("erroLogin");
 
-    fetch("https://script.google.com/macros/s/AKfycby-x46eJe2R_EPQOZ10LdBjd2R-aSg6VBcgeLTN4l-xP0hvN95YTYmlheSjihpIv9F4/exec", {
-      method: "POST",
-      body: new URLSearchParams({ email, senha })
-    })
-    .then(res => res.json())
-    .then(data => {
-      if (data.status === "ok") {
-        // Login correto
-        localStorage.setItem("usuarioNome", data.nome);
-        localStorage.setItem("usuarioEmail", data.email);
-        localStorage.setItem("usuarioCodigo", data.codigo || "");
-        window.location.href = "index.html";
-      } else if (data.status === "erro") {
-        erroLogin.textContent = "❌ E-mail ou senha inválidos.";
-      } else if (data.status === "nao_encontrado") {
-        erroLogin.textContent = "❌ Usuário não registrado. Clique em 'Cadastre-se'.";
-      } else {
-        erroLogin.textContent = "❌ Erro inesperado. Tente novamente.";
-      }
-    })
-    .catch(() => {
-      erroLogin.textContent = "❌ Erro ao consultar servidor. Verifique a conexão.";
-    });
-  });
-</script>
+    form.addEventListener("submit", function(e) {
+      e.preventDefault();
+      const email = document.getElementById("email").value.trim();
+      const senha = document.getElementById("senha").value.trim();
+      erroLogin.textContent = "";
 
+      btnEntrar.disabled = true;
+      btnEntrar.textContent = "🔄 Verificando...";
+
+      fetch("https://script.google.com/macros/s/AKfycby-x46eJe2R_EPQOZ10LdBjd2R-aSg6VBcgeLTN4l-xP0hvN95YTYmlheSjihpIv9F4/exec", {
+        method: "POST",
+        body: new URLSearchParams({ email, senha })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === "ok") {
+          localStorage.setItem("usuarioNome", data.nome);
+          localStorage.setItem("usuarioEmail", data.email);
+          localStorage.setItem("usuarioCodigo", data.codigo || "");
+          window.location.href = "index.html";
+        } else if (data.status === "erro") {
+          erroLogin.textContent = "❌ E-mail ou senha inválidos.";
+        } else if (data.status === "nao_encontrado") {
+          erroLogin.textContent = "❌ Usuário não registrado. Clique em 'Cadastre-se'.";
+        } else {
+          erroLogin.textContent = "❌ Erro inesperado. Tente novamente.";
+        }
+      })
+      .catch(() => {
+        erroLogin.textContent = "❌ Erro ao consultar servidor. Verifique a conexão.";
+      })
+      .finally(() => {
+        btnEntrar.disabled = false;
+        btnEntrar.textContent = "Entrar";
+      });
+    });
+  </script>
 </body>
 </html>
