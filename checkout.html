@@ -69,6 +69,31 @@
       text-align: center;
       font-weight: bold;
     }
+
+    /* Modal de senha */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1001;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.4);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 400px;
+    }
+
+    .modal-content h3 {
+      margin-top: 0;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
@@ -110,9 +135,23 @@
       <label for="estado">Estado</label>
       <input type="text" id="estado" name="estado" required>
 
-      <button type="submit">Enviar</button>
+      <button type="button" onclick="abrirModalSenha()">Enviar</button>
       <div class="mensagem" id="mensagem"></div>
     </form>
+  </div>
+
+  <!-- Modal para senha -->
+  <div class="modal" id="modalSenha">
+    <div class="modal-content">
+      <h3>Defina uma senha de acesso</h3>
+      <label for="senha1">Senha</label>
+      <input type="password" id="senha1" required>
+
+      <label for="senha2">Confirmar Senha</label>
+      <input type="password" id="senha2" required>
+
+      <button onclick="enviarCadastro()">Confirmar e Cadastrar</button>
+    </div>
   </div>
 
   <script>
@@ -135,24 +174,42 @@
         });
     }
 
-    document.getElementById("checkoutForm").addEventListener("submit", function(e) {
-      e.preventDefault();
-      const form = e.target;
+    function abrirModalSenha() {
+      document.getElementById("modalSenha").style.display = "flex";
+    }
+
+    function enviarCadastro() {
+      const senha1 = document.getElementById("senha1").value;
+      const senha2 = document.getElementById("senha2").value;
+
+      if (senha1 !== senha2) {
+        alert("❌ As senhas não conferem.");
+        return;
+      }
+
+      const form = document.getElementById("checkoutForm");
       const dados = new FormData(form);
+      dados.append("senha", senha1);
+
       const objeto = {};
       for (let [chave, valor] of dados.entries()) {
         objeto[chave] = valor;
       }
 
-      fetch("https://script.google.com/macros/s/AKfycbyB7w7BCc5bLICCeTeBovKzD-q_A2zJZ7Ko5n4KO5od-OvPrTP-yvQT_EoF_zJNufgb/exec", {
-        method: "POST",
-        mode: "no-cors",
-        body: new URLSearchParams(objeto)
-      });
-
+      fetch("URL_DO_SEU_SCRIPT", {
+  method: "POST",
+  body: new URLSearchParams(objeto)
+})
+  .then(res => res.text())
+  .then(resposta => {
+    if (resposta === "duplicado") {
+      alert("❌ E-mail já cadastrado!");
+    } else {
       document.getElementById("mensagem").innerText = "✅ Cadastro enviado com sucesso!";
       form.reset();
-    });
+    }
+  });
+
   </script>
 </body>
 </html>
