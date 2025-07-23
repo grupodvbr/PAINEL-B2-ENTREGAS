@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Checkout - Cadastro de Cliente</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f1f1f1;
+      margin: 0;
+      padding: 0;
+    }
+
+    .header {
+      background: #fff;
+      padding: 15px 30px;
+      font-size: 1.2em;
+      color: #3498db;
+      font-weight: bold;
+      border-bottom: 1px solid #ccc;
+    }
+
+    .container {
+      max-width: 600px;
+      background: #fff;
+      margin: 30px auto;
+      padding: 25px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .container h2 {
+      margin-top: 0;
+      text-align: center;
+    }
+
+    label {
+      display: block;
+      margin: 15px 0 5px;
+      font-weight: bold;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 12px;
+      width: 100%;
+      border: none;
+      background-color: #3498db;
+      color: white;
+      font-size: 16px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #2980b9;
+    }
+
+    .mensagem {
+      margin-top: 20px;
+      text-align: center;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    CLENA STORE ▾
+  </div>
+
+  <div class="container">
+    <h2>Cadastro de Cliente</h2>
+    <form id="checkoutForm">
+      <label for="nome">Nome completo</label>
+      <input type="text" id="nome" name="nome" required>
+
+      <label for="nascimento">Data de nascimento</label>
+      <input type="date" id="nascimento" name="nascimento" required>
+
+      <label for="email">E-mail</label>
+      <input type="email" id="email" name="email" required>
+
+      <label for="celular">Número de celular</label>
+      <input type="tel" id="celular" name="celular" required>
+
+      <label for="cep">CEP</label>
+      <input type="text" id="cep" name="cep" maxlength="9" required onblur="buscarCEP()">
+
+      <label for="rua">Rua</label>
+      <input type="text" id="rua" name="rua" required>
+
+      <label for="numero">Número</label>
+      <input type="text" id="numero" name="numero" required>
+
+      <label for="bairro">Bairro</label>
+      <input type="text" id="bairro" name="bairro" required>
+
+      <label for="cidade">Cidade</label>
+      <input type="text" id="cidade" name="cidade" required>
+
+      <label for="estado">Estado</label>
+      <input type="text" id="estado" name="estado" required>
+
+      <button type="submit">Enviar</button>
+      <div class="mensagem" id="mensagem"></div>
+    </form>
+  </div>
+
+  <script>
+    function buscarCEP() {
+      const cep = document.getElementById("cep").value.replace(/\D/g, '');
+      if (cep.length !== 8) return;
+
+      fetch(`https://viacep.com.br/ws/${cep}/json/`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.erro) throw new Error("CEP não encontrado");
+
+          document.getElementById("rua").value = data.logradouro || '';
+          document.getElementById("bairro").value = data.bairro || '';
+          document.getElementById("cidade").value = data.localidade || '';
+          document.getElementById("estado").value = data.uf || '';
+        })
+        .catch(() => {
+          alert("CEP inválido ou não encontrado.");
+        });
+    }
+
+    document.getElementById("checkoutForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const form = e.target;
+      const dados = new FormData(form);
+      const objeto = {};
+      for (let [chave, valor] of dados.entries()) {
+        objeto[chave] = valor;
+      }
+
+      fetch("https://script.google.com/macros/s/AKfycbyB7w7BCc5bLICCeTeBovKzD-q_A2zJZ7Ko5n4KO5od-OvPrTP-yvQT_EoF_zJNufgb/exec", {
+        method: "POST",
+        mode: "no-cors",
+        body: new URLSearchParams(objeto)
+      });
+
+      document.getElementById("mensagem").innerText = "✅ Cadastro enviado com sucesso!";
+      form.reset();
+    });
+  </script>
+</body>
+</html>
