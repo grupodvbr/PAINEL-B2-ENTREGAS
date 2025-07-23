@@ -111,6 +111,13 @@
       text-align: center;
       font-weight: bold;
     }
+
+    .sucesso {
+      color: green;
+      margin-top: 10px;
+      text-align: center;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
@@ -132,13 +139,13 @@
       </button>
     </form>
     
-<!-- Adicione este trecho abaixo do botão -->
-<div class="cadastro">
-  <a href="#" onclick="esqueciSenha()">Esqueceu a senha?</a><br>
-  Não tem cadastro? <a href="checkout.html">Clique aqui</a>
-</div>
+    <div class="cadastro">
+      <a href="#" onclick="esqueciSenha()">Esqueceu a senha?</a><br>
+      Não tem cadastro? <a href="checkout.html">Clique aqui</a>
+    </div>
 
     <div class="erro" id="erroLogin"></div>
+    <div class="sucesso" id="sucessoLogin"></div>
   </div>
 
   <script>
@@ -152,25 +159,28 @@
     const btnText = document.getElementById("btnText");
     const btnSpinner = document.getElementById("btnSpinner");
     const erroLogin = document.getElementById("erroLogin");
+    const sucessoLogin = document.getElementById("sucessoLogin");
+
+    const endpoint = "https://script.google.com/macros/s/AKfycby6zixDmwlYC-NEDVdyObFdsTiK8tHTdTPglrWdR-YxIS8xlbAIrAAGQ_orYodI5ZyQ3g/exec";
 
     form.addEventListener("submit", function(e) {
       e.preventDefault();
       const email = document.getElementById("email").value.trim();
       const senha = document.getElementById("senha").value.trim();
       erroLogin.textContent = "";
+      sucessoLogin.textContent = "";
 
       btnEntrar.disabled = true;
       btnText.textContent = "Verificando...";
       btnSpinner.style.display = "inline-block";
 
-      fetch("https://script.google.com/macros/s/AKfycby6zixDmwlYC-NEDVdyObFdsTiK8tHTdTPglrWdR-YxIS8xlbAIrAAGQ_orYodI5ZyQ3g/exec", {
+      fetch(endpoint, {
         method: "POST",
         body: new URLSearchParams({ email, senha })
       })
       .then(res => res.json())
       .then(data => {
         if (data.status === "ok") {
-          // Salva os dados completos no localStorage
           localStorage.setItem("usuario", JSON.stringify(data));
           window.location.href = "usuario.html";
         } else if (data.status === "erro") {
@@ -190,6 +200,40 @@
         btnSpinner.style.display = "none";
       });
     });
+
+    function esqueciSenha() {
+      const email = document.getElementById("email").value.trim();
+      erroLogin.textContent = "";
+      sucessoLogin.textContent = "";
+
+      if (!email) {
+        erroLogin.textContent = "⚠️ Digite seu e-mail para recuperar a senha.";
+        return;
+      }
+
+      btnText.textContent = "Enviando...";
+      btnSpinner.style.display = "inline-block";
+
+      fetch(endpoint, {
+        method: "POST",
+        body: new URLSearchParams({ email, acao: "recuperar" })
+      })
+      .then(res => res.text())
+      .then(msg => {
+        if (msg.includes("❌")) {
+          erroLogin.textContent = msg;
+        } else {
+          sucessoLogin.textContent = msg;
+        }
+      })
+      .catch(() => {
+        erroLogin.textContent = "❌ Erro ao enviar recuperação. Verifique a conexão.";
+      })
+      .finally(() => {
+        btnText.textContent = "Entrar";
+        btnSpinner.style.display = "none";
+      });
+    }
   </script>
 </body>
 </html>
