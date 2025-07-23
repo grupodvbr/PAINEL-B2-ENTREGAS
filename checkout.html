@@ -110,6 +110,9 @@
     <label>Celular</label>
     <input type="tel" name="celular" required>
 
+    <label>CPF ou CNPJ</label>
+    <input type="text" name="cpf" id="cpf" required maxlength="18" oninput="mascararCpfCnpj(this)">
+
     <label>CEP</label>
     <input type="text" name="cep" id="cep" required onblur="buscarCEP()">
 
@@ -163,6 +166,21 @@
       });
   }
 
+  function mascararCpfCnpj(input) {
+    let v = input.value.replace(/\D/g, '');
+    if (v.length <= 11) {
+      v = v.replace(/(\d{3})(\d)/, "$1.$2");
+      v = v.replace(/(\d{3})(\d)/, "$1.$2");
+      v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+    } else {
+      v = v.replace(/^(\d{2})(\d)/, "$1.$2");
+      v = v.replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3");
+      v = v.replace(/\.(\d{3})(\d)/, ".$1/$2");
+      v = v.replace(/(\d{4})(\d)/, "$1-$2");
+    }
+    input.value = v;
+  }
+
   function abrirModalSenha() {
     document.getElementById("modalSenha").style.display = "flex";
   }
@@ -188,7 +206,7 @@
       dadosObj[chave] = valor;
     }
 
-    fetch("https://script.google.com/macros/s/AKfycbytN_-lYVvg-4nzYuz9LOsMs-3S-P7K-T7tkCZZ5IdDzHmyLY_n0XQFxX4rizyhWYQwlg/exec", {
+    fetch("https://script.google.com/macros/s/AKfycbypUO8_2m3jlVHqf7WaB7uAi8S4ObD9zsy6QhRtMI8eEI5aUJ8tM218vGd6AM-JeYU24g/exec", {
       method: "POST",
       body: new URLSearchParams(dadosObj)
     })
@@ -199,6 +217,8 @@
         document.getElementById("mensagem").innerText = "✅ Cadastro feito com sucesso!";
         form.reset();
         document.getElementById("modalSenha").style.display = "none";
+      } else if (res.status === "duplicado") {
+        alert("❌ E-mail já cadastrado!");
       } else {
         alert("❌ Erro ao cadastrar. Tente novamente.");
       }
