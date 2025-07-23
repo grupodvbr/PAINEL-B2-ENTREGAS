@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Área do Usuário</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: Arial, sans-serif; background: #f7f7f7; padding: 20px; }
+    .container {
+      max-width: 500px;
+      margin: auto;
+      background: white;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h2 { text-align: center; }
+    .info { margin: 15px 0; }
+    .info label { font-weight: bold; display: block; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Bem-vindo(a)</h2>
+    <div class="info"><label>Nome:</label> <span id="nome"></span></div>
+    <div class="info"><label>Email:</label> <span id="email"></span></div>
+    <div class="info"><label>Código:</label> <span id="codigo"></span></div>
+    <button onclick="logout()">Sair</button>
+  </div>
+
+  <script>
+    const usuario = JSON.parse(localStorage.getItem("usuario"));
+    if (!usuario || usuario.status !== "ok") {
+      window.location.href = "login.html";
+    } else {
+      document.getElementById("nome").textContent = usuario.nome;
+      document.getElementById("email").textContent = usuario.email;
+      document.getElementById("codigo").textContent = usuario.codigo;
+    }
+
+    function logout() {
+      localStorage.removeItem("usuario");
+      window.location.href = "login.html";
+    }
+  </script>
+</body>
+</html>
