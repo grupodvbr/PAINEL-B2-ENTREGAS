@@ -76,7 +76,6 @@
     .user-dropdown a:hover {
       background-color: #444;
     }
-
     .container {
       padding: 30px;
     }
@@ -135,136 +134,202 @@
       border-radius: 6px;
       border: 1px solid #ccc;
     }
+
+    #loginModal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: #00000088;
+      z-index: 2000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #loginModal > div {
+      background: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+      max-width: 400px;
+      width: 90%;
+    }
+
+    #loginModal input {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+    }
+
+    #loginModal button {
+      padding: 10px 20px;
+      border-radius: 5px;
+      border: none;
+      cursor: pointer;
+    }
+
+    #loginModal button:first-of-type {
+      background: #3498db;
+      color: white;
+    }
+
+    #loginModal button:last-of-type {
+      background: #ccc;
+      margin-left: 10px;
+    }
   </style>
 </head>
 <body>
-  <div class="navbar">
-    <div class="logo">
-      <img src="https://cdn-icons-png.flaticon.com/512/1046/1046878.png" alt="Logo" width="30">
-      B2 ENTREGAS - CLENA TECNÓLOGIAS
+
+<div class="navbar">
+  <div class="logo">
+    <img src="https://cdn-icons-png.flaticon.com/512/1046/1046878.png" alt="Logo" width="30">
+    B2 ENTREGAS - CLENA TECNÓLOGIAS
+  </div>
+  <div class="menu">
+    <a href="#">Painel</a>
+    <a href="#">Cadastro</a>
+    <a href="#">Pedidos</a>
+    <a href="#">Carteira</a>
+    <a href="#">Histórico</a>
+    <a href="#">Relatório</a>
+    <a href="#">Comunicação</a>
+    <a href="#">Configurações</a>
+  </div>
+  <div class="user-menu">
+    <span title="Ajuda">❓</span>
+    <div id="usuarioLogado" class="dropdown-toggle" onclick="toggleDropdown()" style="display:none;"></div>
+    <a id="botaoLogin" href="#" style="color:#3498db; font-weight:bold;">Entrar</a>
+    <div id="userDropdown" class="user-dropdown">
+      <a href="#" onclick="logout()">Sair</a>
     </div>
-    <div class="menu">
-      <a href="#">Painel</a>
-      <a href="#">Cadastro</a>
-      <a href="#">Pedidos</a>
-      <a href="#">Carteira</a>
-      <a href="#">Histórico</a>
-      <a href="#">Relatório</a>
-      <a href="#">Comunicação</a>
-      <a href="#">Configurações</a>
-    </div>
-    <div class="user-menu">
-      <span title="Ajuda">❓</span>
-      <div id="usuarioLogado" class="dropdown-toggle" onclick="toggleDropdown()" style="display:none;"></div>
-<a id="botaoLogin" href="login.html" style="color:#3498db; font-weight:bold;">Entrar</a>
-      <div id="userDropdown" class="user-dropdown">
-        <a href="#" onclick="logout()">Sair</a>
+  </div>
+</div>
+
+<div class="container" id="painelContainer" style="display:none;">
+  <div class="titulo">📊 Indicadores</div>
+  <p>Estatísticas da operação</p>
+  <div class="grid">
+    <div class="card"><h3>Custo total das entregas</h3><div class="valor" id="custo_total">R$ 0,00</div></div>
+    <div class="card"><h3>Total de pedidos entregues</h3><div class="valor" id="pedidos_entregues">0</div></div>
+  </div>
+
+  <div class="chart-container">
+    <div class="grafico-card">
+      <div class="dropdown">
+        <select><option>Ontem</option><option>Hoje</option><option>Últimos 7 dias</option></select>
       </div>
+      <h3>Solicitações (OS's)</h3>
+      <p>
+        <span id="finalizadas">0</span> Finalizadas -
+        <span id="nao_atendidas">0</span> Não atendidas -
+        <span id="canceladas">0</span> Canceladas
+      </p>
+      <canvas id="graficoPizza" width="300" height="300"></canvas>
     </div>
   </div>
 
-  <div class="container" id="painelContainer" style="display:none;">
-    <div class="titulo">📊 Indicadores</div>
-    <p>Estatísticas da operação</p>
-
-    <div class="grid">
-      <div class="card">
-        <h3>Custo total das entregas</h3>
-        <div class="valor" id="custo_total">R$ 0,00</div>
-      </div>
-      <div class="card">
-        <h3>Total de pedidos entregues</h3>
-        <div class="valor" id="pedidos_entregues">0</div>
-      </div>
-    </div>
-
-    <div class="chart-container">
-      <div class="grafico-card">
-        <div class="dropdown">
-          <select>
-            <option>Ontem</option>
-            <option>Hoje</option>
-            <option>Últimos 7 dias</option>
-          </select>
-        </div>
-        <h3>Solicitações (OS's)</h3>
-        <p>
-          <span id="finalizadas">0</span> Finalizadas -
-          <span id="nao_atendidas">0</span> Não atendidas -
-          <span id="canceladas">0</span> Canceladas
-        </p>
-        <canvas id="graficoPizza" width="300" height="300"></canvas>
-      </div>
-    </div>
-
-    <div class="titulo">👤 Dados do Usuário</div>
-    <div class="grid">
-      <div class="card"><h3>Nome</h3><div class="valor" id="nome">---</div></div>
-      <div class="card"><h3>Email</h3><div class="valor" id="email">---</div></div>
-      <div class="card"><h3>Crédito na Carteira</h3><div class="valor" id="credito">R$ 0,00</div></div>
-      <div class="card"><h3>Mais informações</h3><div class="valor"><a href="perfil.html">Ver perfil completo</a></div></div>
-    </div>
+  <div class="titulo">👤 Dados do Usuário</div>
+  <div class="grid">
+    <div class="card"><h3>Nome</h3><div class="valor" id="nome">---</div></div>
+    <div class="card"><h3>Email</h3><div class="valor" id="email">---</div></div>
+    <div class="card"><h3>Crédito na Carteira</h3><div class="valor" id="credito">R$ 0,00</div></div>
+    <div class="card"><h3>Mais informações</h3><div class="valor"><a href="perfil.html">Ver perfil completo</a></div></div>
   </div>
+</div>
 
-  <script>
-    function toggleDropdown() {
-      const dropdown = document.getElementById("userDropdown");
-      dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
-    }
+<!-- Modal -->
+<div id="loginModal">
+  <div>
+    <h3>Login</h3>
+    <label>Email:</label>
+    <input type="email" id="loginEmail" />
+    <label>Senha:</label>
+    <input type="password" id="loginSenha" />
+    <button onclick="fazerLogin()">Entrar</button>
+    <button onclick="fecharModal()">Cancelar</button>
+  </div>
+</div>
 
-    function logout() {
-      localStorage.clear();
-      location.reload();
-    }
+<script>
+  function toggleDropdown() {
+    const dropdown = document.getElementById("userDropdown");
+    dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
+  }
 
-    const nome = localStorage.getItem("usuarioNome");
-    const email = localStorage.getItem("usuarioEmail");
+  function logout() {
+    localStorage.clear();
+    location.reload();
+  }
 
-    if (nome && email) {
-      document.getElementById("botaoLogin").style.display = "none";
-      const userDisplay = document.getElementById("usuarioLogado");
-      userDisplay.textContent = `${nome} ▾`;
-      userDisplay.style.display = "inline-block";
-      document.getElementById("painelContainer").style.display = "block";
+  const nome = localStorage.getItem("usuarioNome");
+  const email = localStorage.getItem("usuarioEmail");
 
-      // Substitua pela URL real do seu Google Apps Script
-      const url = "https://script.google.com/macros/s/SEU_SCRIPT_ID/exec";
+  if (nome && email) {
+    document.getElementById("botaoLogin").style.display = "none";
+    const userDisplay = document.getElementById("usuarioLogado");
+    userDisplay.textContent = `${nome} ▾`;
+    userDisplay.style.display = "inline-block";
+    document.getElementById("painelContainer").style.display = "block";
 
-      fetch(url)
-        .then(res => res.json())
-        .then(data => {
-          document.getElementById("nome").textContent = data.nome;
-          document.getElementById("email").textContent = data.email;
-          document.getElementById("credito").textContent = `R$ ${parseFloat(data.credito).toFixed(2)}`;
-          document.getElementById("custo_total").textContent = `R$ ${parseFloat(data.custo_total).toFixed(2)}`;
-          document.getElementById("pedidos_entregues").textContent = data.pedidos_entregues;
-          document.getElementById("finalizadas").textContent = data.finalizadas;
-          document.getElementById("nao_atendidas").textContent = data.nao_atendidas;
-          document.getElementById("canceladas").textContent = data.canceladas;
+    const url = "https://script.google.com/macros/s/SEU_SCRIPT_ID/exec";
 
-          const ctx = document.getElementById('graficoPizza').getContext('2d');
-          new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-              labels: ['Finalizadas', 'Não atendidas', 'Canceladas'],
-              datasets: [{
-                data: [
-                  parseInt(data.finalizadas),
-                  parseInt(data.nao_atendidas),
-                  parseInt(data.canceladas)
-                ],
-                backgroundColor: ['#2ecc71', '#95a5a6', '#e74c3c']
-              }]
-            },
-            options: {
-              responsive: true,
-              plugins: {
-                legend: { position: 'bottom' }
-              }
-            }
-          });
+    fetch(url)
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById("nome").textContent = data.nome;
+        document.getElementById("email").textContent = data.email;
+        document.getElementById("credito").textContent = `R$ ${parseFloat(data.credito).toFixed(2)}`;
+        document.getElementById("custo_total").textContent = `R$ ${parseFloat(data.custo_total).toFixed(2)}`;
+        document.getElementById("pedidos_entregues").textContent = data.pedidos_entregues;
+        document.getElementById("finalizadas").textContent = data.finalizadas;
+        document.getElementById("nao_atendidas").textContent = data.nao_atendidas;
+        document.getElementById("canceladas").textContent = data.canceladas;
+
+        new Chart(document.getElementById('graficoPizza'), {
+          type: 'doughnut',
+          data: {
+            labels: ['Finalizadas', 'Não atendidas', 'Canceladas'],
+            datasets: [{
+              data: [parseInt(data.finalizadas), parseInt(data.nao_atendidas), parseInt(data.canceladas)],
+              backgroundColor: ['#2ecc71', '#95a5a6', '#e74c3c']
+            }]
+          },
+          options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
         });
+      });
+  }
+
+  document.getElementById("botaoLogin").addEventListener("click", function(event) {
+    event.preventDefault();
+    document.getElementById("loginModal").style.display = "flex";
+  });
+
+  function fecharModal() {
+    document.getElementById("loginModal").style.display = "none";
+  }
+
+  async function fazerLogin() {
+    const email = document.getElementById("loginEmail").value.trim();
+    const senha = document.getElementById("loginSenha").value.trim();
+    if (!email || !senha) return alert("Preencha todos os campos.");
+
+    const scriptURL = 'https://script.google.com/macros/s/AKfycby-TC-xPJISrESpJNUEmKiD5ra4M8LsHTTminET6FeokGG9BEoBewUNAbc5wfNxbNaI3A/exec';
+    try {
+      const res = await fetch(`${scriptURL}?email=${encodeURIComponent(email)}&senha=${encodeURIComponent(senha)}`);
+      const dados = await res.json();
+      if (dados.status === "sucesso") {
+        localStorage.setItem("usuarioNome", dados.nome);
+        localStorage.setItem("usuarioEmail", dados.email);
+        fecharModal();
+        location.reload();
+      } else {
+        alert("Email ou senha inválidos.");
+      }
+    } catch (e) {
+      alert("Erro ao conectar com o servidor.");
     }
-  </script>
+  }
+</script>
 </body>
 </html>
